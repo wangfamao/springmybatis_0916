@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Order">
+
+	<resultMap type="Order" id="OrderMap">
+		<id property="id" column="id"/>
+		<result property="receiveName" column="receiveName"/>
+		<result property="receiveAddress" column="receiveAddress"/>
+		<result property="receivePhone" column="receivePhone"/>
+		<result property="createTime" column="createTime"/>
+		<!-- 一对多 -->
+		<collection property="orderProducts" ofType="OrderProduct">
+			<id property="id" column="opid"/>
+			<!-- 多对一 -->
+			<association property="product" javaType="Product">
+				<id property="id" column="pid"/>
+				<result property="name" column="pname"/>
+				<result property="price" column="price"/>
+			</association>
+		</collection>
+	</resultMap>
+	<select id="queryAll" resultType="Order">
+		select * from order_ order by id
+	</select>
+	<select id="queryAllOrderAndProduct" resultMap="OrderMap">
+		select o.*,p.id pid,p.name pname,p.price,op.id opid from order_ o,product p,order_product op where o.id = op.oid and p.id = op.pid order by o.id
+	</select>
+	<select id="queryById" resultType="Order">
+		select  * from order_ where id = #{id}
+	</select>
+	<select id="queryOrderAndProductById" resultMap="OrderMap">
+		select o.*,p.id pid,p.name pname,p.price,op.id opid from order_ o,product p,order_product op where o.id = op.oid and p.id = op.pid and o.id = #{id}
+	</select>
+	<insert id="add" parameterType="Order">
+		insert into order_(receiveName,receiveAddress,receivePhone,createTime) values(#{receiveName},#{receiveAddress},#{receivePhone},now())
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			select last_insert_id() as id
+		</selectKey>
+	</insert>
+	<delete id="deleteById">
+		delete from order_ where id = #{id}
+	</delete>
+	<update id="update" parameterType="Order">
+		update order_ 
+		<trim prefix="set" suffixOverrides=",">
+			<if test="receiveName!=null and receiveName!=''">
+				receiveName = #{receiveName},
+			</if>
+			<if test="receiveAddress!=null and receiveAddress!=''">
+				receiveAddress = #{receiveAddress},
+			</if>
+			<if test="receivePhone!=null and receivePhone!=''">
+				receivePhone = #{receivePhone},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+</mapper>

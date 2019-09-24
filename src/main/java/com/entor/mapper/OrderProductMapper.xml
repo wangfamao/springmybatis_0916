@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrderProduct">
+
+	<insert id="add" parameterType="OrderProduct">
+		insert into order_product(pid,oid) values(#{product.id},#{order.id})
+	</insert>
+	<select id="queryById" resultType="OrderProduct">
+		select * from order_product where id = #{id}
+	</select>
+	<select id="queryAll" resultType="OrderProduct">
+		select * from order_product order by id
+	</select>
+	<delete id="deleteById">
+		delete from order_product where id = #{id}
+	</delete>
+	<update id="update" parameterType="OrderProduct">
+		update order_product set
+		<trim prefix="set" suffixOverrides=",">
+			<if test="product!=null">
+				pid = #{product.id},
+			</if>
+			<if test="order!=null">
+				oid = #{order.id},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+	<delete id="deleteByOrderId">
+		delete from order_product where oid = #{oid}
+	</delete>
+	<delete id="deleteByProductId">
+		delete from order_product where pid = #{pid}
+	</delete>
+</mapper>
